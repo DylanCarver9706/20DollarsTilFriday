@@ -17,6 +17,6 @@ CREATE TABLE IF NOT EXISTS events (
   title VARCHAR(255) NOT NULL,
   date DATE NOT NULL,
   type ENUM('bill', 'payday') NOT NULL,
-  user_id INT,
+  user_id INT NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
