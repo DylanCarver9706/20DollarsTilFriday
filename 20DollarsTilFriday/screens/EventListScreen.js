@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, Button } from 'react-native';
 import axios from 'axios';
 
-const EventListScreen = () => {
+export function EventListScreen() {
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
@@ -11,7 +11,7 @@ const EventListScreen = () => {
 
   const fetchEvents = async () => {
     try {
-      const response = await axios.get('http://your-backend-url/events');
+      const response = await axios.get('https://b8ef-71-85-245-93.ngrok-free.app/events');
       setEvents(response.data);
     } catch (error) {
       console.error('Error fetching events: ', error);
@@ -34,5 +34,3 @@ const EventListScreen = () => {
     </View>
   );
 };
-
-export default EventListScreen;

@@ -11,12 +11,12 @@ CREATE TABLE IF NOT EXISTS users (
   password VARCHAR(255) NOT NULL
 );
 
--- Create events table
+-- Create events table with a foreign key constraint for user_id
 CREATE TABLE IF NOT EXISTS events (
   id INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
   date DATE NOT NULL,
   type ENUM('bill', 'payday') NOT NULL,
   user_id INT,
-  FOREIGN KEY (user_id) REFERENCES users(id)
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
