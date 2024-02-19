@@ -36,3 +36,4 @@ yarn-error.*
 
 # Private keys
 .env
+apiConfig.js

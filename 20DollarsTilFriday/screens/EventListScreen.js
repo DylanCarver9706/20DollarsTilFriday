@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, Button, TextInput, Modal, TouchableOpacity } from 'react-native';
 import axios from 'axios';
+import API_BASE_URL from '../../apiConfig';
 
 export function EventListScreen() {
   const [events, setEvents] = useState([]);
@@ -18,7 +19,7 @@ export function EventListScreen() {
 
   const fetchEvents = async () => {
     try {
-      const response = await axios.get('https://b8ef-71-85-245-93.ngrok-free.app/events');
+      const response = await axios.get(`${API_BASE_URL}/events`);
       setEvents(response.data);
     } catch (error) {
       console.error('Error fetching events: ', error);
@@ -27,7 +28,7 @@ export function EventListScreen() {
 
   const handleCreateEvent = async () => {
     try {
-      await axios.post('https://b8ef-71-85-245-93.ngrok-free.app/events', {
+      await axios.post(`${API_BASE_URL}/events`, {
         title: newEventTitle,
         type: newEventType,
         date: newEventDate,
@@ -46,7 +47,7 @@ export function EventListScreen() {
 
   const handleDeleteEvent = async (eventId) => {
     try {
-      await axios.delete(`https://b8ef-71-85-245-93.ngrok-free.app/events/${eventId}`);
+      await axios.delete(`${API_BASE_URL}/events/${eventId}`);
       fetchEvents(); // Refresh event list after deleting event
     } catch (error) {
       console.error('Error deleting event: ', error);
@@ -56,7 +57,7 @@ export function EventListScreen() {
   const handleUpdateEvent = async () => {
     if (!updateEvent) return;
     try {
-      await axios.put(`https://b8ef-71-85-245-93.ngrok-free.app/events/${updateEvent.id}`, {
+      await axios.put(`${API_BASE_URL}/events/${updateEvent.id}`, {
         ...updateEvent,
         userId: userId
       });
