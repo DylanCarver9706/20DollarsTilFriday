@@ -93,17 +93,17 @@ app.delete("/users/:id", (req, res) => {
 
 // Create an event
 app.post('/events', (req, res) => {
-  const { title, date, type, user_id } = req.body;
-  const query = 'INSERT INTO events (title, date, type, user_id) VALUES (?, ?, ?, ?)';
-  connection.query(query, [title, date, type, user_id], (error, results) => {
-    if (error) {
-      console.error('Error creating event: ', error);
-      res.status(500).json({ error: 'Error creating event' });
-      return;
-    }
-    res.status(201).json({ message: 'Event created successfully', eventId: results.insertId });
+    const { title, type, user_id, amount, recurring_type, frequency, payment_method } = req.body;
+    const query = 'INSERT INTO events (title, type, user_id, amount, recurring_type, frequency, payment_method) VALUES (?, ?, ?, ?, ?, ?, ?)';
+    connection.query(query, [title, type, user_id, amount, recurring_type, frequency, payment_method], (error, results) => {
+      if (error) {
+        console.error('Error creating event: ', error);
+        res.status(500).json({ error: 'Error creating event' });
+        return;
+      }
+      res.status(201).json({ message: 'Event created successfully', eventId: results.insertId });
+    });
   });
-});
 
 // Read all events
 app.get('/events', (req, res) => {
@@ -118,19 +118,19 @@ app.get('/events', (req, res) => {
 });
 
 // Update an event
-app.put('/events/:id', (req, res) => {
-  const eventId = req.params.id;
-  const { title, date, type, user_id } = req.body;
-  const query = 'UPDATE events SET title = ?, date = ?, type = ?, user_id = ? WHERE id = ?';
-  connection.query(query, [title, date, type, user_id, eventId], (error) => {
-    if (error) {
-      console.error('Error updating event: ', error);
-      res.status(500).json({ error: 'Error updating event' });
-      return;
-    }
-    res.json({ message: 'Event updated successfully' });
-  });
-});
+// app.put('/events/:id', (req, res) => {
+//   const eventId = req.params.id;
+//   const { title, date, type, user_id } = req.body;
+//   const query = 'UPDATE events SET title = ?, date = ?, type = ?, user_id = ? WHERE id = ?';
+//   connection.query(query, [title, date, type, user_id, eventId], (error) => {
+//     if (error) {
+//       console.error('Error updating event: ', error);
+//       res.status(500).json({ error: 'Error updating event' });
+//       return;
+//     }
+//     res.json({ message: 'Event updated successfully' });
+//   });
+// });
 
 // Delete an event
 app.delete('/events/:id', (req, res) => {

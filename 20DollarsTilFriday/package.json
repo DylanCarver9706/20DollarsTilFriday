@@ -9,6 +9,10 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.10",
+    "@fullcalendar/daygrid": "^6.1.10",
+    "@fullcalendar/rrule": "^6.1.10",
+    "@react-native-picker/picker": "^2.6.1",
     "@react-navigation/native": "^6.1.10",
     "@react-navigation/stack": "^6.3.21",
     "axios": "^1.6.7",
