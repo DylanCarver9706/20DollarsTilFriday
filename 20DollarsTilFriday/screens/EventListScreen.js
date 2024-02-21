@@ -7,19 +7,40 @@ import {
   TextInput,
   Modal,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import axios from "axios";
-import API_BASE_URL from "../../apiConfig";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import API_BASE_URL from "../apiConfig";
 
 export function EventListScreen() {
   const [events, setEvents] = useState([]);
   const [newEventTitle, setNewEventTitle] = useState("");
   const [newEventType, setNewEventType] = useState("");
-  const [newEventDate, setNewEventDate] = useState("");
+  const [newEventDate1, setNewEventDate1] = useState(null);
+  const [newEventDate2, setNewEventDate2] = useState(null);
+  const [newEventFrequency, setNewEventFrequency] = useState(null);
   const [isUpdateModalVisible, setIsUpdateModalVisible] = useState(false);
   const [updateEvent, setUpdateEvent] = useState(null);
   const [isAddEventModalVisible, setIsAddEventModalVisible] = useState(false);
+  const [showDatePicker1, setShowDatePicker1] = useState(false);
+  const [showDatePicker2, setShowDatePicker2] = useState(false);
   const userId = "1"; // Placeholder user ID
+
+  let currentDate = new Date();
+
+  const formatDate = (rawDate) => {
+    let date = new Date(rawDate);
+
+    let year = date.getFullYear();
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
+
+    let formattedMonth = month < 10 ? `0${month}` : `${month}`;
+    let formattedDay = day < 10 ? `0${day}` : `${day}`;
+
+    return `${year}-${formattedMonth}-${formattedDay}`;
+  };
 
   useEffect(() => {
     fetchEvents();
@@ -39,14 +60,13 @@ export function EventListScreen() {
       await axios.post(`${API_BASE_URL}/events`, {
         title: newEventTitle,
         type: newEventType,
-        date: newEventDate,
+        date: newEventDates[0], // Only storing the last two dates
         user_id: userId,
       });
       fetchEvents(); // Refresh event list after creating event
       // Clear input fields
       setNewEventTitle("");
       setNewEventType("");
-      setNewEventDate("");
       setIsAddEventModalVisible(false); // Hide the add event modal
     } catch (error) {
       console.error("Error creating event: ", error);
@@ -74,6 +94,62 @@ export function EventListScreen() {
     } catch (error) {
       console.error("Error updating event: ", error);
     }
+  };
+
+  useEffect(() => {
+    calculateFrequency(); // This will be executed when the state changes
+}, [newEventDate2]);
+
+  // Function to calculate frequency
+  const calculateFrequency = () => {
+    console.log("Here");
+    // setTimeout(() => {--
+      console.log("Hello World");
+      console.log(newEventDate1);
+      console.log(newEventDate2);
+      console.log("End");
+      if (newEventDate1 && newEventDate2) {
+        const lastDate = new Date(newEventDate1);
+        const prevDate = new Date(newEventDate2);
+        const diffTime = Math.abs(lastDate - prevDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        console.log("Diff days: " + diffDays);
+        setNewEventFrequency(diffDays);
+        return diffDays;
+      } else {
+        console.log("No dates");
+        return null;
+      }
+    // }, 2000);
+  };
+
+  const onChangeDate1 = ({ type }, selectedDate) => {
+    // if (type == "set") {
+      setNewEventDate1(formatDate(selectedDate));
+      console.log("Date 1: " + formatDate(selectedDate));
+      toggleDatepicker1();
+    // } else {
+    //   toggleDatepicker();
+    // }
+  };
+
+  const onChangeDate2 = ({ type }, selectedDate) => {
+    // if (type == "set") {
+      setNewEventDate2(formatDate(selectedDate));
+      console.log("Date 2: " + formatDate(selectedDate));
+      toggleDatepicker2();
+      // setNewEventFrequency();
+    // } else {
+    //   toggleDatepicker();
+    // }
+  };
+
+  const toggleDatepicker1 = () => {
+    setShowDatePicker1(!showDatePicker1);
+  };
+
+  const toggleDatepicker2 = () => {
+    setShowDatePicker2(!showDatePicker2);
   };
 
   return (
@@ -116,11 +192,33 @@ export function EventListScreen() {
               value={newEventType}
               onChangeText={setNewEventType}
             />
-            <TextInput
-              placeholder="Event Date (YYYY-MM-DD)"
-              value={newEventDate}
-              onChangeText={setNewEventDate}
-            />
+            {/* Using date picker for event dates */}
+            <Text>When is the last time this event occurred?</Text>
+            <Button title="Add Date" onPress={toggleDatepicker1} />
+            {showDatePicker1 && !showDatePicker2 && !newEventDate1 &&(
+              <DateTimePicker
+                value={currentDate}
+                mode="date"
+                display="spinner"
+                onChange={onChangeDate1}
+              />
+            )}
+            <Text>When is the last time this event occurred before that?</Text>
+            <Button title="Add Date" onPress={toggleDatepicker2} />
+            {showDatePicker2 && !showDatePicker1 && !newEventDate2 && (
+              <DateTimePicker
+                value={currentDate}
+                mode="date"
+                display="default"
+                onChange={onChangeDate2}
+              />
+            )}
+            {newEventDate1 && newEventDate2 && (
+              <View>
+                {/* Displaying frequency */}
+                <Text>Frequency: {newEventFrequency} days</Text>
+              </View>
+            )}
             <Button title="Add" onPress={handleCreateEvent} />
             <TouchableOpacity
               style={{ marginTop: 10 }}
@@ -138,7 +236,12 @@ export function EventListScreen() {
           <View>
             <Text>{item.title}</Text>
             <Text>{item.type}</Text>
-            <Text>{item.date.split("T")[0]}</Text>
+            <Text>{item.amount}</Text>
+            <Text>{item.recurring_type}</Text>
+            <Text>{item.frequency}</Text>
+            <Text>{item.payment_method}</Text>
+            <Text>{item.last_confirmed_date.split("T")[0]}</Text>
+            <Text>{item.next_event_date.split("T")[0]}</Text>
             <Button
               title="Delete"
               onPress={() => {
@@ -190,13 +293,6 @@ export function EventListScreen() {
               value={updateEvent ? updateEvent.type : ""}
               onChangeText={(text) =>
                 setUpdateEvent({ ...updateEvent, type: text })
-              }
-            />
-            <TextInput
-              placeholder="New Date (YYYY-MM-DD)"
-              value={updateEvent ? updateEvent.date.split("T")[0] : ""}
-              onChangeText={(text) =>
-                setUpdateEvent({ ...updateEvent, date: text })
               }
             />
             <Button title="Update" onPress={handleUpdateEvent} />
