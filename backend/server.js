@@ -93,17 +93,17 @@ app.delete("/users/:id", (req, res) => {
 
 // Create an event
 app.post('/events', (req, res) => {
-    const { title, type, user_id, amount, recurring_type, frequency, payment_method } = req.body;
-    const query = 'INSERT INTO events (title, type, user_id, amount, recurring_type, frequency, payment_method) VALUES (?, ?, ?, ?, ?, ?, ?)';
-    connection.query(query, [title, type, user_id, amount, recurring_type, frequency, payment_method], (error, results) => {
-      if (error) {
-        console.error('Error creating event: ', error);
-        res.status(500).json({ error: 'Error creating event' });
-        return;
-      }
-      res.status(201).json({ message: 'Event created successfully', eventId: results.insertId });
-    });
+  const { title, type, user_id, amount, recurring_type, frequency, payment_method, last_confirmed_date, next_event_date } = req.body;
+  const query = 'INSERT INTO events (title, type, user_id, amount, recurring_type, frequency, payment_method, last_confirmed_date, next_event_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+  connection.query(query, [title, type, user_id, amount, recurring_type, frequency, payment_method, last_confirmed_date, next_event_date], (error, results) => {
+    if (error) {
+      console.error('Error creating event: ', error);
+      res.status(500).json({ error: 'Error creating event' });
+      return;
+    }
+    res.status(201).json({ message: 'Event created successfully', eventId: results.insertId });
   });
+});
 
 // Read all events
 app.get('/events', (req, res) => {
